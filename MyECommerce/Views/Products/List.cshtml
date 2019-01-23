@@ -1,0 +1,83 @@
+﻿@model List<MyECommerce.Models.Product>
+
+@{
+    ViewBag.Title = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>List Of Products</h2>
+<p>
+    @Html.ActionLink("New Product", "ProductForm", "Products", new { }, new { @class = "btn btn-primary" })
+</p>
+<table class="table table-bordered" id="products">
+    <thead>
+        <tr>
+            <th>Products</th>
+            <th>Price</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@Html.ActionLink(product.Name, "Edit", "Products", new {id = product.Id}, null)</td>
+                <td>@product.Price</td>
+                <td>
+                    <button data-product-id="@product.Id" class="btn-link js-delete">Delete </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#products").dataTable({
+                //ajax: {
+                //    url: "/api/products",
+                //    dataSrc: ""
+                //},
+                //columns: [
+                //    {
+                //        data: "name",
+                //        render: function(data, type, product) {
+                //            return "<a href='products/edit/" + product.id + "'>" + product.name + "</a>";
+                //        }
+                //    },
+                //    //{
+                //    //    data: "price"
+                //    //},
+                //    {
+                //        data: "id",
+                //        render: function(data) {
+                //            return "<button class='btn-link js-delete' data-product-id=" + data + ">Delete</button>";
+                //        }
+                //    }
+                //]
+            });
+
+
+            $("#products").on("click", ".js-delete", function () {
+                var button = $(this);
+
+                bootbox.confirm("Are you sure you want to delete this product?",
+                    function(result) {
+                        if (result) {
+                            $.ajax({
+                                url: "/api/products/" + button.attr("data-product-id"),
+                                method: "DELETE",
+                                success: function() {
+                                    button.parents("tr").remove();
+                                }
+                            });
+                        }
+                    });
+            });
+        });
+    </script>
+}
